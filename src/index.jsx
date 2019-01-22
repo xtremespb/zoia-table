@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 import ZTablePagination from './ZPagination.jsx';
 import ZTh from './ZTh.jsx';
 import ZSearch from './ZSearch.jsx';
@@ -85,36 +86,20 @@ export default class ZTable extends Component {
             sortColumn: this.state.sortColumn || this.props.sortColumn || '',
             sortDirection: this.state.sortDirection || this.props.sortDirection || ''
         };
-        fetch(`${this.props.source.url}${this.props.source.method === 'GET' ? this.encodeQueryString(params) : ''}`, {
+
+        axios({
             method: this.props.source.method,
-            mode: 'cors',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            redirect: 'follow',
-            referrer: 'no-referrer',
-            body: this.props.source.method === 'POST' ? JSON.stringify(params) : null,
+            url: this.props.source.url,
+            responseType: 'json',
+            data: params
         }).then(response => {
-            response.json()
-                .then(data => {
-                    this.setState({
-                        data: data.items,
-                        total: data.total,
-                        loading: false,
-                        loadingText: false,
-                        error: false
-                    });
-                })
-                .catch(error => {
-                    if (this.props.debug) {
-                        console.log(error);
-                    }
-                    this.setState({
-                        error: true,
-                        loading: false,
-                        loadingText: false,
-                        data: []
-                    });
-                });
+            this.setState({
+                data: response.data.items,
+                total: response.data.total,
+                loading: false,
+                loadingText: false,
+                error: false
+            });
         }).catch(error => {
             if (this.props.debug) {
                 console.log(error);
@@ -134,10 +119,10 @@ export default class ZTable extends Component {
             const cells = this.state.columns.map((col) => {
                 let val = item[col.id] || '';
                 val = col.process && typeof col.process === 'function' ? col.process(item[col.id], item) : val;
-                return <td key={`${this.props.prefix}_td_${col.id}`} className={col.cssRow || ''}>{val}</td>;
+                return (<td key={`${this.props.prefix}_td_${col.id}`} className={col.cssRow || ''}>{val}</td>);
             });
             const columnID = this.props.hideColumnID ? '' : <td><input onChange={this.checkboxChangeHandler} className="uk-checkbox" type="checkbox" data-id={item.id} checked={!!this.state.checkboxes[item.id]} /></td>;
-            return <tr key={`${this.props.prefix}_tr_${item.id}`}>{columnID}{cells}</tr>;
+            return (<tr key={`${this.props.prefix}_tr_${item.id}`}>{columnID}{cells}</tr>);
         }) : false;
     }
 
@@ -240,7 +225,7 @@ export default class ZTable extends Component {
         this.fetchURL(false);
     }
 
-    render = () => <div className="ztable-wrap">
+    render = () => (<div className="ztable-wrap">
         <div uk-grid="true">
             <div className="uk-width-expand@s">
                 <ZTablePagination page={this.state.page} totalPages={Math.ceil(this.state.total / this.props.itemsPerPage)} pageClickHandler={this.pageClickHandler} />
@@ -272,5 +257,5 @@ export default class ZTable extends Component {
             </div>
         </div>
         {this.state.loading ? <ZLoading /> : null}
-    </div>;
+    </div>);
 }
