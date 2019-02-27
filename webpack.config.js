@@ -18,12 +18,13 @@ module.exports = {
                 cache: true,
                 parallel: true,
                 sourceMap: true,
-                extractComments: true,
+                extractComments: false,
                 terserOptions: {
                     output: {
-                        comments: /@license/i,
+                        // comments: /@license/i,
+                        comments: false,
                     }
-                },
+                }
             }), 
             new OptimizeCSSAssetsPlugin({
                 cssProcessorPluginOptions: {
