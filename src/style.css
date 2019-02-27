@@ -36,3 +36,11 @@
     background: #fef4f6;
     color: #f0506e;
 }
+
+.ztable-cell {
+    min-height: 26px;
+}
+
+.ztable-cell:focus {
+    outline: 0 !important;
+}

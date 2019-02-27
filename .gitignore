@@ -25,3 +25,7 @@ typings/
 .env
 dist/
 lib/
+app.js
+settings.js
+webserver.js
+data.json
